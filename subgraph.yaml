@@ -1,4 +1,4 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
@@ -13,10 +13,13 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-
+        - PublicationEntity
+        - MetadataEntity
       abis:
         - name: PublishingLogic
           file: ./abis/PublishingLogic.json
       eventHandlers:
+        - event: PostCreated(indexed uint256,indexed uint256,string,address,bytes,address,bytes,uint256)
+          handler: handlePublication
 
       file: ./src/mapping.ts

@@ -1,5 +1,16 @@
-type ExampleEntity @entity {
+type MetadataEntity @entity {
   id: ID!
-  block: Bytes!
-  count: BigInt!
+  bpm: Int!
+  genre: String!
+  keyScale: String!
+  type: String!
+}
+
+type PublicationEntity @entity {
+  id: ID!
+  profileId: String!
+  pubId: String!
+  contentURI: String!
+  timestamp: String!
+  metadata: MetadataEntity!
 }
