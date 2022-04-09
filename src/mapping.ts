@@ -1,6 +1,5 @@
 import {
   BigInt,
-  ipfs,
   JSONValue,
   Value,
   log,
@@ -10,29 +9,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import { PostCreated } from "../generated/PublishingLogic/PublishingLogic";
 import { PublicationEntity, MetadataEntity } from "../generated/schema";
-
-export function processItem(value: JSONValue, userData: Value): void {
-  // See the JSONValue documentation for details on dealing
-  // with JSON values
-  let obj = value.toObject();
-  let id = obj.get("id");
-  let bpm = obj.get("bpm");
-  let genre = obj.get("genre");
-  let keyScale = obj.get("keyScale");
-  let type = obj.get("type");
-
-  if (!id || !bpm || !genre || !keyScale || !type) {
-    return;
-  }
-
-  // Callbacks can also created entities
-  let newItem = new MetadataEntity(id.toString());
-  newItem.bpm = <i32>bpm.toI64();
-  newItem.genre = genre.toString();
-  newItem.keyScale = keyScale.toString();
-  newItem.type = type.toString();
-  newItem.save();
-}
 
 export function handlePublication(event: PostCreated): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -46,57 +22,76 @@ export function handlePublication(event: PostCreated): void {
 
   entity.profileId = event.params.profileId.toHex();
   entity.pubId = event.params.pubId.toHex();
-  entity.contentURI = event.params.contentURI;
+  entity.contentURI = event.params.contentURI.toString();
   entity.timestamp = event.params.timestamp.toString();
+  const contentURI = event.params.contentURI.toString();
 
-  log.info("Hello 1 *************", []);
-  let data = ipfs.cat(entity.contentURI);
-  if (!data) return;
-  log.info("Hello 2 *************: {}", [data.toHexString()]);
-  let value = json.fromBytes(data);
-  let parsedObj = value.toObject();
-  if (!parsedObj) {
-    log.error("Unable to parse beats Object", []);
-    return;
-  }
-  const metadataId = parsedObj.get("metadata_id");
-  if (!metadataId) {
-    log.error("Unable to get metadata ID.", []);
-    return;
-  }
-  const attributes = parsedObj.get("attributes");
-  if (!attributes) {
-    log.error("Unable to get attributes.", []);
-    return;
-  }
-  const attributeArray = attributes.toArray();
-  const genre = attributeArray[0].toString();
-  const bpm = attributeArray[1].toI64();
-  const keyScale = attributeArray[2].toString();
-  const type = attributeArray[3].toString();
-  if (!genre) {
-    log.error("Unable to get genre.", []);
-    return;
-  }
-  if (!bpm) {
-    log.error("Unable to get bpm.", []);
-    return;
-  }
-  if (!keyScale) {
-    log.error("Unable to get keyscale.", []);
-    return;
-  }
-  if (!type) {
-    log.error("Unable to get type.", []);
-    return;
+  if (
+    contentURI.includes('"traitType":"Genre"') &&
+    contentURI.includes('"traitType":"Beats Per Minute"') &&
+    contentURI.includes('"traitType":"Key Scale"') &&
+    contentURI.includes('"traitType":"Beat Type"')
+  ) {
+    entity.save();
   }
 
-  let metadataEntity = MetadataEntity.load(metadataId.toString());
-  if (!metadataEntity) {
-    metadataEntity = new MetadataEntity(metadataId.toString());
-  }
-  metadataEntity.save();
-  entity.metadata = metadataId.toString();
+  // const data = event.params.contentURI.toString();
+  // log.info("Hello 1 ************* {}", [data]);
+  // if (!data) return;
+  // const value = json.try_fromString(data);
+  // log.info("Hello a ************{}", [typeof value]);
+  // if (!value) {
+  //   return;
+  // }
+  // if (!value.isOk) {
+  //   return;
+  // }
+  // log.info("Hello 2 *************", []);
+  // if (value.value.kind !== JSONValueKind.OBJECT) {
+  //   return;
+  // }
+  // log.info("Hello 3 *************", []);
+  // let parsedObj = value.value.toObject();
+  // if (!parsedObj) {
+  //   log.info("Hello 4 ************", []);
+  //   return;
+  // }
+  // const metadataId = parsedObj.get("metadata_id");
+  // if (!metadataId) {
+  //   log.info("Unable to get metadata ID.", []);
+  //   return;
+  // }
+  // const attributes = parsedObj.get("attributes");
+  // if (!attributes) {
+  //   log.info("Unable to get attributes.", []);
+  //   return;
+  // }
+  // const attributeArray = attributes.toArray();
+  // const genre = attributeArray[0].toString();
+  // const bpm = attributeArray[1].toI64();
+  // const keyScale = attributeArray[2].toString();
+  // const type = attributeArray[3].toString();
+  // if (!genre) {
+  //   log.info("Unable to get genre.", []);
+  //   return;
+  // }
+  // if (!bpm) {
+  //   log.info("Unable to get bpm.", []);
+  //   return;
+  // }
+  // if (!keyScale) {
+  //   log.info("Unable to get keyscale.", []);
+  //   return;
+  // }
+  // if (!type) {
+  //   log.info("Unable to get type.", []);
+  //   return;
+  // }
 
-  entity.save();
+  // let metadataEntity = MetadataEntity.load(metadataId.toString());
+  // if (!metadataEntity) {
+  //   metadataEntity = new MetadataEntity(metadataId.toString());
+  // }
+  // metadataEntity.save();
+  // entity.metadata = metadataId.toString();
 }
