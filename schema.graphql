@@ -1,6 +1,6 @@
 type MetadataEntity @entity {
   id: ID!
-  bpm: Int!
+  bpm: BigInt!
   genre: String!
   keyScale: String!
   type: String!

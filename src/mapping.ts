@@ -25,7 +25,7 @@ export function handlePublication(event: PostCreated): void {
   entity.pubId = event.params.pubId.toHex();
   entity.contentURI = event.params.contentURI.toString();
   entity.timestamp = event.params.timestamp.toString();
-  let contentURI = event.params.contentURI.toString();
+  let contentURI = event.params.contentURI;
 
   // if (
   //   contentURI.includes('"traitType":"Genre"') &&
@@ -36,10 +36,10 @@ export function handlePublication(event: PostCreated): void {
   //   entity.save();
   // }
 
-  const data = event.params.contentURI.toString();
+  let data = event.params.contentURI;
   log.info("Hello 1 ************* {}", [data]);
   if (!data) return;
-  const value = json.try_fromString(data);
+  let value = json.try_fromString(data);
   log.info("Hello a ************{}", [typeof value]);
   if (!value) {
     return;
@@ -51,27 +51,28 @@ export function handlePublication(event: PostCreated): void {
   if (value.value.kind !== JSONValueKind.OBJECT) {
     return;
   }
-  log.info("Hello 3 *************", []);
+  log.info("Hello 3 ************* '{}'", [value.value.kind.toString()]);
   let parsedObj = value.value.toObject();
+  log.info("DEBUG - Successfully parsed object.", []);
   if (!parsedObj) {
     log.info("Hello 4 ************", []);
     return;
   }
-  const metadataId = parsedObj.get("metadata_id");
+  let metadataId = parsedObj.get("metadata_id");
   if (!metadataId) {
     log.info("Unable to get metadata ID.", []);
     return;
   }
-  const attributes = parsedObj.get("attributes");
+  let attributes = parsedObj.get("attributes");
   if (!attributes) {
     log.info("Unable to get attributes.", []);
     return;
   }
-  const attributeArray = attributes.toArray();
-  const genre = attributeArray[0].toString();
-  const bpm = attributeArray[1].toI64();
-  const keyScale = attributeArray[2].toString();
-  const type = attributeArray[3].toString();
+  let attributeArray = attributes.toArray();
+  let genre = jsonToString(attributeArray[0]);
+  let bpm = jsonToBigInt(attributeArray[1]);
+  let keyScale = jsonToString(attributeArray[2]);
+  let type = jsonToString(attributeArray[3]);
   if (!genre) {
     log.info("Unable to get genre.", []);
     return;
@@ -95,4 +96,17 @@ export function handlePublication(event: PostCreated): void {
   }
   metadataEntity.save();
   entity.metadata = metadataId.toString();
+}
+
+export function jsonToString(val: JSONValue | null): string {
+  if (val != null && val.kind === JSONValueKind.STRING) {
+    return val.toString()
+  }
+  return ''
+}
+export function jsonToBigInt(val: JSONValue | null): BigInt {
+  if (val != null && val.kind === JSONValueKind.NUMBER) {
+    return BigInt.fromI64(val.toI64())
+  }
+  return BigInt.fromI64(0)
 }
