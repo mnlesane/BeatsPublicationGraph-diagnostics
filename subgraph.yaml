@@ -3,8 +3,8 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    network: mumbai
     name: PublishingLogic
+    network: mumbai
     source:
       address: "0x4BF0c7AD32Fd2d32089790a54485e23f5C7736C0"
       abi: PublishingLogic
@@ -14,8 +14,8 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - PublicationEntity
         - MetadataEntity
+        - PublicationEntity
       abis:
         - name: PublishingLogic
           file: ./abis/PublishingLogic.json
