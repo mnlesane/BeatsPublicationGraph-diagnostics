@@ -27,19 +27,19 @@ export function handlePublication(event: PostCreated): void {
   entity.timestamp = event.params.timestamp.toString();
   let contentURI = event.params.contentURI.toString();
 
-  if (
-    contentURI.includes('"traitType":"Genre"') &&
-    contentURI.includes('"traitType":"Beats Per Minute"') &&
-    contentURI.includes('"traitType":"Key Scale"') &&
-    contentURI.includes('"traitType":"Beat Type"')
-  ) {
-    entity.save();
-  }
+  // if (
+  //   contentURI.includes('"traitType":"Genre"') &&
+  //   contentURI.includes('"traitType":"Beats Per Minute"') &&
+  //   contentURI.includes('"traitType":"Key Scale"') &&
+  //   contentURI.includes('"traitType":"Beat Type"')
+  // ) {
+  //   entity.save();
+  // }
 
-  let data = event.params.contentURI.toString();
+  const data = event.params.contentURI.toString();
   log.info("Hello 1 ************* {}", [data]);
   if (!data) return;
-  let value = json.try_fromBytes(changetype<Bytes>(data));
+  const value = json.try_fromString(data);
   log.info("Hello a ************{}", [typeof value]);
   if (!value) {
     return;
@@ -57,21 +57,21 @@ export function handlePublication(event: PostCreated): void {
     log.info("Hello 4 ************", []);
     return;
   }
-  let metadataId = parsedObj.get("metadata_id");
+  const metadataId = parsedObj.get("metadata_id");
   if (!metadataId) {
     log.info("Unable to get metadata ID.", []);
     return;
   }
-  let attributes = parsedObj.get("attributes");
+  const attributes = parsedObj.get("attributes");
   if (!attributes) {
     log.info("Unable to get attributes.", []);
     return;
   }
-  let attributeArray = attributes.toArray();
-  let genre = attributeArray[0].toString();
-  let bpm = attributeArray[1].toI64();
-  let keyScale = attributeArray[2].toString();
-  let type = attributeArray[3].toString();
+  const attributeArray = attributes.toArray();
+  const genre = attributeArray[0].toString();
+  const bpm = attributeArray[1].toI64();
+  const keyScale = attributeArray[2].toString();
+  const type = attributeArray[3].toString();
   if (!genre) {
     log.info("Unable to get genre.", []);
     return;
