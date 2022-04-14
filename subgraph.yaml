@@ -3,8 +3,8 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: PublishingLogic
     network: mumbai
+    name: PublishingLogic
     source:
       address: "0xd7B3481De00995046C7850bCe9a5196B7605c367"
       abi: PublishingLogic
@@ -22,5 +22,4 @@ dataSources:
       eventHandlers:
         - event: PostCreated(indexed uint256,indexed uint256,string,address,bytes,address,bytes,uint256)
           handler: handlePublication
-
       file: ./src/mapping.ts
