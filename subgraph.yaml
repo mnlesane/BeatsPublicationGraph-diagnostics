@@ -6,9 +6,9 @@ dataSources:
     name: PublishingLogic
     network: mumbai
     source:
-      address: "0xd7B3481De00995046C7850bCe9a5196B7605c367"
+      address: "0x4BF0c7AD32Fd2d32089790a54485e23f5C7736C0"
       abi: PublishingLogic
-      startBlock: 25668682
+      startBlock: 25931000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
